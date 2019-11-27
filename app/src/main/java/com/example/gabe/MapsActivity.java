@@ -24,7 +24,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private LocationManager locationListener;
-    private String provider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

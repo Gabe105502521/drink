@@ -1,6 +1,11 @@
 package com.example.gabe;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.LocationManager;
+import android.provider.Settings;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -31,6 +36,32 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        LocationManager locationManager
+                = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            openGPS();
+        }
 
+    }
+    private void openGPS() {
+        new AlertDialog.Builder(MainActivity.this)
+                .setIcon(R.mipmap.ic_launcher)
+                .setTitle("提示")
+                .setMessage("沒有開啟定位")
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .setPositiveButton("打開gps", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(intent);
+                        dialogInterface.dismiss();
+                    }
+                })
+                .show();
     }
 }
