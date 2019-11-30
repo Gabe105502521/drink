@@ -27,4 +27,11 @@
         app:layout_constraintLeft_toRightOf="@+id/btn_random"
         app:layout_constraintTop_toTopOf="parent"
         android:text="地圖" />
+    <Button
+        android:id="@+id/btn_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@+id/btn_map"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="列表" />
 </android.support.constraint.ConstraintLayout>
