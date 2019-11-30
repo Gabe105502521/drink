@@ -47,7 +47,7 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         String content = null;
-        ListActivity.tv.setText(data);
+        //ListActivity.tv.setText(data);
         String crappyPrefix = "null";
 
         if(data.startsWith(crappyPrefix)){
@@ -64,24 +64,25 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
            JSONArray array = jsonObject.getJSONArray("results");
            for (int i = 0; i < array.length(); i++) {
                JSONObject jsonObject2 = array.getJSONObject(i);
-               String geometry = jsonObject2.getString("geometry");
-               if (geometry != null) {
-                   ListActivity.tv.setText("!");
-               }
-               String name = jsonObject2.getString("name");
-               if (name != null) {
-                   ListActivity.tv.setText("!!");
-               }
-               String vicinity = jsonObject2.getString("vicinity");
-               if (vicinity != null) {
-                   ListActivity.tv.setText("!!!");
-               }
 
-           }
+               //get lat, lng
+                String geometry = jsonObject2.getString("geometry");
+               JSONObject geo_jsonObject = new JSONObject(geometry);
+               String location = geo_jsonObject.getString("location");
+               JSONObject loca_jsonObject = new JSONObject(location);
+               String lat = loca_jsonObject.getString("lat");
+               String lng = loca_jsonObject.getString("lng");
+               //ListActivity.tv.setText(lat+", "+lng);
+
+               //get name、vicinity
+               String name = jsonObject2.getString("name");
+               String vicinity = jsonObject2.getString("vicinity");
+               ListActivity.tv.setText(lat+", "+lng+" \n"+name+"\n"+vicinity);
+               }
         }
         catch(JSONException e) {
             Log.e(ListActivity.Tag,Log.getStackTraceString(e));
         }
-        //ListActivity.tv.setText(content);
+        //ListActivity.tv.setText(geometry);
     }
 }
