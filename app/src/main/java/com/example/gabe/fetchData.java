@@ -1,7 +1,14 @@
 package com.example.gabe;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,12 +22,18 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class fetchData extends AsyncTask<Void, Void, Void> {
-    String data;
-    //JSONArray JArray=new JSONArray();
-    //JSONObject jsonObj =new JSONObject();
+    private String data;
+    public static List<drinkshop> shops = new ArrayList<drinkshop>();
+    private Context mContext;
+    public fetchData (Context context){
+        mContext = context;
+    }
     @Override
     protected Void doInBackground(Void... voids) {
         try {
@@ -46,43 +59,83 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        String content = null;
-        //ListActivity.tv.setText(data);
-        String crappyPrefix = "null";
 
-        if(data.startsWith(crappyPrefix)){
+        String crappyPrefix = "null";
+        if (data.startsWith(crappyPrefix)) {
             data = data.substring(crappyPrefix.length(), data.length());
         } //報錯加的Value null of type org.json.JSONObject$1 cannot be converted to JSONObject
-        try{
+
+        try {
             //建立一個JSONObject並帶入JSON格式文字，getString(String key)取出欄位的數值
             JSONObject jsonObject = new JSONObject(data);
-           /* if(jsonObject.has("results")){
-                content = jsonObject.getString("results");
-            }else{
-                content="?";
-            }*/
-           JSONArray array = jsonObject.getJSONArray("results");
-           for (int i = 0; i < array.length(); i++) {
-               JSONObject jsonObject2 = array.getJSONObject(i);
+            JSONArray array = jsonObject.getJSONArray("results");
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject jsonObject2 = array.getJSONObject(i);
 
-               //get lat, lng
+                //get lat, lng
                 String geometry = jsonObject2.getString("geometry");
-               JSONObject geo_jsonObject = new JSONObject(geometry);
-               String location = geo_jsonObject.getString("location");
-               JSONObject loca_jsonObject = new JSONObject(location);
-               String lat = loca_jsonObject.getString("lat");
-               String lng = loca_jsonObject.getString("lng");
-               //ListActivity.tv.setText(lat+", "+lng);
+                JSONObject geo_jsonObject = new JSONObject(geometry);
+                String location = geo_jsonObject.getString("location");
+                JSONObject loca_jsonObject = new JSONObject(location);
+                String lat = loca_jsonObject.getString("lat");
+                String lng = loca_jsonObject.getString("lng");
 
-               //get name、vicinity
-               String name = jsonObject2.getString("name");
-               String vicinity = jsonObject2.getString("vicinity");
-               ListActivity.tv.setText(lat+", "+lng+" \n"+name+"\n"+vicinity);
-               }
+                //get name、vicinity、rating
+                String name = jsonObject2.getString("name");
+                String vicinity = jsonObject2.getString("vicinity");
+                String rating = jsonObject2.getString("rating");
+                drinkshop shop=new drinkshop(name, Double.parseDouble(lat), Double.parseDouble(lng), vicinity, Double.parseDouble(rating));
+                shops.add(shop);
+            }
+        } catch (JSONException e) {
+            Log.e(ListActivity.Tag, Log.getStackTraceString(e));
         }
-        catch(JSONException e) {
-            Log.e(ListActivity.Tag,Log.getStackTraceString(e));
+        //sort
+        sortRating(shops);
+
+        List<HashMap<String, String>> list = new ArrayList<>();
+        String shopsName[] = new String[20];
+        String shopsRating[] = new String[20];
+        for (int i=0; i<shops.size(); i++) {
+            shopsName[i] = shops.get(i).name;
         }
-        //ListActivity.tv.setText(geometry);
+        for (int i = 0; i < shops.size(); i++) {
+            shopsRating[i] = shops.get(i).rating.toString();
+        }
+        for(int i = 0 ; i < 20 ; i++){
+            HashMap<String , String> hashMap = new HashMap<>();
+            hashMap.put("shopsName" , shopsName[i]);
+            hashMap.put("shopsRating" , shopsRating[i]);
+            //將shopsName , shopsRating存入HashMap之中
+            list.add(hashMap);
+            //把HashMap存入list之中
+        }
+        ListAdapter listAdapter = new SimpleAdapter(
+                mContext,
+                list,
+                android.R.layout.simple_list_item_2 ,
+                new String[]{"shopsName" , "shopsRating"} ,
+                new int[]{android.R.id.text1 , android.R.id.text2});
+        // 5個參數 : context , List , layout , key1 & key2 , text1 & text2
+        ListActivity.listView.setAdapter(listAdapter);
+        ListActivity.listView.setOnItemClickListener(onClickListView);
+}
+    //sort by rating
+    public static void sortRating(List<drinkshop> list){
+        Collections.sort(list);//编译通过；
     }
+
+
+
+
+    private AdapterView.OnItemClickListener onClickListView = new AdapterView.OnItemClickListener(){
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            // Toast 快顯功能 第三個參數 Toast.LENGTH_SHORT 2秒  LENGTH_LONG 5秒
+            Toast.makeText(mContext,"點選第 "+(position +1) +" 個 \n內容：",Toast.LENGTH_SHORT).show();
+        }
+    };
+
+
+
 }
