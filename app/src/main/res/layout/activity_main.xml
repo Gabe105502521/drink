@@ -34,4 +34,11 @@
         app:layout_constraintLeft_toRightOf="@+id/btn_map"
         app:layout_constraintTop_toTopOf="parent"
         android:text="列表" />
+    <Button
+        android:id="@+id/btn_maker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@+id/btn_list"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="自訂飲料" />
 </android.support.constraint.ConstraintLayout>

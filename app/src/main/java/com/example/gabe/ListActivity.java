@@ -13,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ListView;
 
+import java.util.List;
+
 
 public class ListActivity extends AppCompatActivity implements LocationListener {
     public static final String Tag = "ListActivity88";
@@ -33,19 +35,21 @@ public class ListActivity extends AppCompatActivity implements LocationListener 
             }
         }
         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if(location == null){
+
+        /*if(location == null){
         }else {
             lng = location.getLongitude();
             lat = location.getLatitude();
-        }
+        }*/
         //https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+lat+", "+%+lng+"&radius=500&keyword=%E9%A3%B2%E6%96%99&key=AIzaSyBMum64_lpZuX7_M0ua4Mwc8aqz3CyArLI
         //透過gps, 更新, 間隔幾公尺
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
-        getList();
+        getList(location);
     }
 
-    private void getList(){
-        fetchData process = new fetchData(this);
+
+    private void getList(Location location){
+        fetchData process = new fetchData(this, location);
         process.execute();
     }
     @Override
@@ -69,4 +73,6 @@ public class ListActivity extends AppCompatActivity implements LocationListener 
     public void onProviderDisabled(String provider) {
         Log.i(Tag, "onProviderDisabled");  //gps關掉
     }
+
+
 }

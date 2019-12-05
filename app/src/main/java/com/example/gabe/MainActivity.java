@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
         Button btn_random = findViewById(R.id.btn_random);
         Button btn_map = findViewById(R.id.btn_map);
         Button btn_list = findViewById(R.id.btn_list);
+        Button btn_maker = findViewById(R.id.btn_maker);
         btn_random.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -44,6 +45,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setClass(MainActivity.this, ListActivity.class);
+                startActivity(intent);
+            }
+        });
+        btn_maker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(MainActivity.this, makerActivity.class);
                 startActivity(intent);
             }
         });

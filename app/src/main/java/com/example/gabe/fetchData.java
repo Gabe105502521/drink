@@ -1,6 +1,7 @@
 package com.example.gabe;
 
 import android.content.Context;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
@@ -31,9 +32,13 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
     private String data;
     public static List<drinkshop> shops = new ArrayList<drinkshop>();
     private Context mContext;
-    public fetchData (Context context){
+    private Location mlocation;
+    public fetchData (Context context, Location location) {
         mContext = context;
+        mlocation = location;
     }
+
+
     @Override
     protected Void doInBackground(Void... voids) {
         try {
@@ -59,6 +64,8 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+
+        //location == null 會造成程式crush, 現在的寫法可能會須等一陣子才拿到
 
         String crappyPrefix = "null";
         if (data.startsWith(crappyPrefix)) {
@@ -96,16 +103,23 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
         List<HashMap<String, String>> list = new ArrayList<>();
         String shopsName[] = new String[20];
         String shopsRating[] = new String[20];
+        String shopsDistance[] = new String[20];
         for (int i=0; i<shops.size(); i++) {
             shopsName[i] = shops.get(i).name;
         }
         for (int i = 0; i < shops.size(); i++) {
             shopsRating[i] = shops.get(i).rating.toString();
         }
+        Double mlng = mlocation.getLongitude();
+        Double mlat = mlocation.getLatitude();
+        for (int i = 0; i < shops.size(); i++) {
+            shopsDistance[i] = Double.toString(gps2m(mlat, mlng, shops.get(i).lat, shops.get(i).lng));
+        }
+
         for(int i = 0 ; i < 20 ; i++){
             HashMap<String , String> hashMap = new HashMap<>();
             hashMap.put("shopsName" , shopsName[i]);
-            hashMap.put("shopsRating" , shopsRating[i]);
+            hashMap.put("shopsRating" , "評分: "+shopsRating[i]+"    距離: "+shopsDistance[i] + "公尺");
             //將shopsName , shopsRating存入HashMap之中
             list.add(hashMap);
             //把HashMap存入list之中
@@ -125,6 +139,20 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
         Collections.sort(list);//编译通过；
     }
 
+    //經緯算距離
+    private double gps2m(double lat_a, double lng_a, double lat_b, double lng_b) {
+        double EARTH_RADIUS = 6378137.0;
+        double radLat1 = (lat_a * Math.PI / 180.0);
+        double radLat2 = (lat_b * Math.PI / 180.0);
+        double a = radLat1 - radLat2;
+        double b = (lng_a - lng_b) * Math.PI / 180.0;
+        double s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2)+
+                Math.cos(radLat1) * Math.cos(radLat2)
+                        * Math.pow(Math.sin(b / 2), 2)));
+        s = s * EARTH_RADIUS;
+        s = Math.round(s * 10000) / 10000;
+        return s;
+    }
 
 
 
@@ -135,7 +163,4 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
             Toast.makeText(mContext,"點選第 "+(position +1) +" 個 \n內容：",Toast.LENGTH_SHORT).show();
         }
     };
-
-
-
 }

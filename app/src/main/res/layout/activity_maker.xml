@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".makerActivity">
+
+    <Spinner
+        android:gravity="center"
+        android:id="@+id/spinner1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="0dp" />
+    <Spinner
+        android:gravity="center"
+        android:id="@+id/spinner2"
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/spinner1"
+        />
+    <Spinner
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:id="@+id/spinner3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/spinner2"
+        />
+
+    <Button
+        android:id="@+id/btn_join"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="加入"
+        app:layout_constraintTop_toBottomOf="@+id/spinner3"
+         />
+
+    <Button
+        android:id="@+id/btn_clear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="清空"
+        app:layout_constraintTop_toBottomOf="@+id/spinner3"
+        app:layout_constraintLeft_toRightOf="@+id/btn_join"
+        />
+    <Button
+        android:id="@+id/btn_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="送出"
+        app:layout_constraintTop_toBottomOf="@+id/spinner3"
+        app:layout_constraintLeft_toRightOf="@+id/btn_clear"
+        />
+
+
+
+    <ListView
+        android:id="@+id/list_maker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/btn_join"/>
+
+</android.support.constraint.ConstraintLayout>
