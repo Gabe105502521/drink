@@ -48,7 +48,8 @@
                 android:value="com.example.gabe.MainActivity" />
         </activity>
         <activity android:name=".ListActivity" />
-        <activity android:name=".makerActivity"></activity>
+        <activity android:name=".makerActivity" />
+        <activity android:name=".drinkActivity"></activity>
     </application>
 
 </manifest>

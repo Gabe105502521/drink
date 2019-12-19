@@ -1,6 +1,7 @@
 package com.example.gabe;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -32,10 +33,8 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
     private String data;
     public static List<drinkshop> shops = new ArrayList<drinkshop>();
     private Context mContext;
-    private Location mlocation;
-    public fetchData (Context context, Location location) {
+    public fetchData (Context context) {
         mContext = context;
-        mlocation = location;
     }
 
 
@@ -66,40 +65,40 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
         super.onPostExecute(aVoid);
 
         //location == null 會造成程式crush, 現在的寫法可能會須等一陣子才拿到
+        if(ListActivity.cnt == 1) {
+            String crappyPrefix = "null";
+            if (data.startsWith(crappyPrefix)) {
+                data = data.substring(crappyPrefix.length(), data.length());
+            } //報錯加的Value null of type org.json.JSONObject$1 cannot be converted to JSONObject
 
-        String crappyPrefix = "null";
-        if (data.startsWith(crappyPrefix)) {
-            data = data.substring(crappyPrefix.length(), data.length());
-        } //報錯加的Value null of type org.json.JSONObject$1 cannot be converted to JSONObject
+            try {
+                //建立一個JSONObject並帶入JSON格式文字，getString(String key)取出欄位的數值
+                JSONObject jsonObject = new JSONObject(data);
+                JSONArray array = jsonObject.getJSONArray("results");
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject jsonObject2 = array.getJSONObject(i);
 
-        try {
-            //建立一個JSONObject並帶入JSON格式文字，getString(String key)取出欄位的數值
-            JSONObject jsonObject = new JSONObject(data);
-            JSONArray array = jsonObject.getJSONArray("results");
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject jsonObject2 = array.getJSONObject(i);
+                    //get lat, lng
+                    String geometry = jsonObject2.getString("geometry");
+                    JSONObject geo_jsonObject = new JSONObject(geometry);
+                    String location = geo_jsonObject.getString("location");
+                    JSONObject loca_jsonObject = new JSONObject(location);
+                    String lat = loca_jsonObject.getString("lat");
+                    String lng = loca_jsonObject.getString("lng");
 
-                //get lat, lng
-                String geometry = jsonObject2.getString("geometry");
-                JSONObject geo_jsonObject = new JSONObject(geometry);
-                String location = geo_jsonObject.getString("location");
-                JSONObject loca_jsonObject = new JSONObject(location);
-                String lat = loca_jsonObject.getString("lat");
-                String lng = loca_jsonObject.getString("lng");
-
-                //get name、vicinity、rating
-                String name = jsonObject2.getString("name");
-                String vicinity = jsonObject2.getString("vicinity");
-                String rating = jsonObject2.getString("rating");
-                drinkshop shop=new drinkshop(name, Double.parseDouble(lat), Double.parseDouble(lng), vicinity, Double.parseDouble(rating));
-                shops.add(shop);
+                    //get name、vicinity、rating
+                    String name = jsonObject2.getString("name");
+                    String vicinity = jsonObject2.getString("vicinity");
+                    String rating = jsonObject2.getString("rating");
+                    drinkshop shop = new drinkshop(name, Double.parseDouble(lat), Double.parseDouble(lng), vicinity, Double.parseDouble(rating));
+                    shops.add(shop);
+                }
+            } catch (JSONException e) {
+                Log.e(ListActivity.Tag, Log.getStackTraceString(e));
             }
-        } catch (JSONException e) {
-            Log.e(ListActivity.Tag, Log.getStackTraceString(e));
+            //sort
+            sortRating(shops);
         }
-        //sort
-        sortRating(shops);
-
         List<HashMap<String, String>> list = new ArrayList<>();
         String shopsName[] = new String[20];
         String shopsRating[] = new String[20];
@@ -110,8 +109,14 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
         for (int i = 0; i < shops.size(); i++) {
             shopsRating[i] = shops.get(i).rating.toString();
         }
-        Double mlng = mlocation.getLongitude();
-        Double mlat = mlocation.getLatitude();
+        Double mlng = 0.0, mlat = 0.0;
+        if( ListActivity.location == null) {
+            Toast.makeText(mContext," 未得到位址",Toast.LENGTH_SHORT).show();
+        }else {
+            mlng = ListActivity.location.getLongitude();
+            mlat = ListActivity.location.getLatitude();
+            //Toast.makeText(mContext, " " + mlat + " " + mlng, Toast.LENGTH_SHORT).show();
+        }
         for (int i = 0; i < shops.size(); i++) {
             shopsDistance[i] = Double.toString(gps2m(mlat, mlng, shops.get(i).lat, shops.get(i).lng));
         }
@@ -160,7 +165,9 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             // Toast 快顯功能 第三個參數 Toast.LENGTH_SHORT 2秒  LENGTH_LONG 5秒
-            Toast.makeText(mContext,"點選第 "+(position +1) +" 個 \n內容：",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(mContext,"點選第 "+(position +1) +" 個 \n內容：",Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(mContext,drinkActivity.class);
+            mContext.startActivity(intent);
         }
     };
 }
