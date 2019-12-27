@@ -1,6 +1,7 @@
 package com.example.gabe;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -27,7 +29,9 @@ public class ListActivity extends AppCompatActivity implements LocationListener 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_list);
+        getSupportActionBar().setTitle("附近飲料店");
 
         listView = findViewById(R.id.listView);
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -36,8 +40,9 @@ public class ListActivity extends AppCompatActivity implements LocationListener 
                 return;
             }
         }
-        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
+        location = getLastKnownLocation();
+        lat = location.getLatitude();
+        lng = location.getLongitude();
         /*if(location == null){
         }else {
             lng = location.getLongitude();
@@ -51,6 +56,27 @@ public class ListActivity extends AppCompatActivity implements LocationListener 
         }
         cnt += 1; //第二次crash?
         getList();
+    }
+
+    private Location getLastKnownLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return null;
+        }
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        List<String> providers = locationManager.getAllProviders();
+        Location bestLocation = null;
+        for (String provider : providers) {
+
+            Location l = locationManager.getLastKnownLocation(provider);
+            if (l == null) {
+                continue;
+            }
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                // Found best last known location: %s", l);
+                bestLocation = l;
+            }
+        }
+        return bestLocation;
     }
 
 

@@ -24,6 +24,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,8 +42,8 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... voids) {
         try {
-            URL url =  new URL("https://api.myjson.com/bins/189646");
-//            URL url =  new URL("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+ListActivity.lat+", "+ListActivity.lng+"&radius=500&keyword="+URLEncoder.encode("飲料")+ "&key=AIzaSyBMum64_lpZuX7_M0ua4Mwc8aqz3CyArLI");
+            //URL url =  new URL("https://api.myjson.com/bins/189646");
+           URL url =  new URL("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+ListActivity.location.getLatitude()+", "+ListActivity.location.getLongitude()+"&radius=1000&keyword="+URLEncoder.encode("飲料")+ "&key=AIzaSyBMum64_lpZuX7_M0ua4Mwc8aqz3CyArLI");
 //            https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=24.968052,%20%20121.192143&radius=500&keyword=%E9%A3%B2%E6%96%99&key=AIzaSyBMum64_lpZuX7_M0ua4Mwc8aqz3CyArLI
             HttpURLConnection htTpURLConnection = (HttpURLConnection)url.openConnection();
             InputStream inputStream = htTpURLConnection.getInputStream();
@@ -63,7 +64,7 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-
+        int len =0;
         //location == null 會造成程式crush, 現在的寫法可能會須等一陣子才拿到
         if(ListActivity.cnt == 1) {
             String crappyPrefix = "null";
@@ -75,7 +76,8 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
                 //建立一個JSONObject並帶入JSON格式文字，getString(String key)取出欄位的數值
                 JSONObject jsonObject = new JSONObject(data);
                 JSONArray array = jsonObject.getJSONArray("results");
-                for (int i = 0; i < array.length(); i++) {
+                len = array.length();
+                for (int i = 0; i < len; i++) {
                     JSONObject jsonObject2 = array.getJSONObject(i);
 
                     //get lat, lng
@@ -100,13 +102,13 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
             sortRating(shops);
         }
         List<HashMap<String, String>> list = new ArrayList<>();
-        String shopsName[] = new String[20];
-        String shopsRating[] = new String[20];
-        String shopsDistance[] = new String[20];
-        for (int i=0; i<shops.size(); i++) {
+        String shopsName[] = new String[len];
+        String shopsRating[] = new String[len];
+        String shopsDistance[] = new String[len];
+        for (int i=0; i< len ; i++) {
             shopsName[i] = shops.get(i).name;
         }
-        for (int i = 0; i < shops.size(); i++) {
+        for (int i = 0; i < len; i++) {
             shopsRating[i] = shops.get(i).rating.toString();
         }
         Double mlng = 0.0, mlat = 0.0;
@@ -117,11 +119,11 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
             mlat = ListActivity.location.getLatitude();
             //Toast.makeText(mContext, " " + mlat + " " + mlng, Toast.LENGTH_SHORT).show();
         }
-        for (int i = 0; i < shops.size(); i++) {
+        for (int i = 0; i < len; i++) {
             shopsDistance[i] = Double.toString(gps2m(mlat, mlng, shops.get(i).lat, shops.get(i).lng));
         }
 
-        for(int i = 0 ; i < 20 ; i++){
+        for(int i = 0 ; i < len ; i++){
             HashMap<String , String> hashMap = new HashMap<>();
             hashMap.put("shopsName" , shopsName[i]);
             hashMap.put("shopsRating" , "評分: "+shopsRating[i]+"    距離: "+shopsDistance[i] + "公尺");

@@ -7,16 +7,23 @@
     android:orientation="vertical"
     tools:context=".random_Activity">
 
-
+    <TextView
+        android:id="@+id/tip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="\n將您猶豫的選項輸入 我們幫您選"
+        android:textSize="17dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/edt_input"
-        android:layout_width="wrap_content"
+        android:layout_width="170dp"
         android:layout_height="wrap_content"
         android:hint="輸入選項"
         android:textColorHint="#95A1AA"
-        app:layout_constraintTop_toTopOf="parent">
-    </EditText>
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tip"></EditText>
 
     <Button
         android:id="@+id/btn_submit"
@@ -24,16 +31,15 @@
         android:layout_height="wrap_content"
         android:text="送出"
         app:layout_constraintLeft_toRightOf="@+id/edt_input"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tip"
         tools:ignore="UnknownId" />
 
     <ListView
         android:id="@+id/list"
-        app:layout_constraintTop_toBottomOf="@id/edt_input"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        />
+        android:layout_height="499dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/edt_input" />
 
     <Button
         android:id="@+id/btn_done"
@@ -41,7 +47,8 @@
         android:layout_height="wrap_content"
         android:text="Done"
         app:layout_constraintLeft_toRightOf="@+id/btn_submit"
-        app:layout_constraintBottom_toTopOf="@+id/list"/>
+        app:layout_constraintTop_toBottomOf="@+id/tip"
+        />
 
 
 

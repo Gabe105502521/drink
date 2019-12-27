@@ -1,24 +1,59 @@
 package com.example.gabe;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.location.LocationManager;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
+        /*
+        //先讀取txt
+        AssetManager assetManager = getAssets();
+        InputStream inputStream = null;
+        try {
+            inputStream = assetManager.open("text.txt");
+            String text = loadTextFile(inputStream);
+            //tv.setText(text);
+            BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(text.getBytes(Charset.forName("utf8"))), Charset.forName("utf8")));
+            String line, tmp;
+
+            while ( (line = br.readLine()) != null ) {
+                if(!line.trim().equals("")){
+                    String[] ss = line.split("\\s");
+                    tmp  = ss[0] + "\nL  " + ss[1];
+                }
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }*/
+
         Button btn_random = findViewById(R.id.btn_random);
         Button btn_map = findViewById(R.id.btn_map);
         Button btn_list = findViewById(R.id.btn_list);
@@ -62,6 +97,15 @@ public class MainActivity extends AppCompatActivity {
             openGPS();
         }
 
+    }
+    private String loadTextFile(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        byte[] bytes = new byte[4096];
+        int len = 0;
+        while ((len = inputStream.read(bytes)) > 0) {
+            byteArrayOutputStream.write(bytes, 0, len);
+        }
+        return new String(byteArrayOutputStream.toByteArray(), "UTF-8");
     }
     private void openGPS() {
         new AlertDialog.Builder(MainActivity.this)

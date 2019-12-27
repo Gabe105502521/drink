@@ -2,13 +2,17 @@ package com.example.gabe;
 
 import android.os.AsyncTask;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 public class drinkshop implements Comparable<drinkshop>{
     protected String name;
     protected Double lat;
     protected Double lng;
     protected String vicinity;
     protected Double rating;
-
+    public List<HashMap<String, String>> list;
     public drinkshop(String name, Double lat, Double lng,  String vicinity, Double rating) {
         super();
         this.name = name;
