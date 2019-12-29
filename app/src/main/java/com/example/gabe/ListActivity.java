@@ -1,31 +1,22 @@
 package com.example.gabe;
 
-import android.Manifest;
-import android.app.ActionBar;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Build;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.SimpleAdapter;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
-public class ListActivity extends AppCompatActivity implements LocationListener {
-    public static final String Tag = "ListActivity88";
-    public static double lat, lng;
-    private LocationManager locationManager;
+public class ListActivity extends AppCompatActivity {
     public static ListView listView;
-    public static Location location;
-    public static int cnt = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,77 +25,48 @@ public class ListActivity extends AppCompatActivity implements LocationListener 
         getSupportActionBar().setTitle("附近飲料店");
 
         listView = findViewById(R.id.listView);
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) { //android 版本 > android版 api版本
-            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
+        List<HashMap<String, String>> list = new ArrayList<>();
+        String shopsName[] = new String[fetchData.len];
+        String shopsRating[] = new String[fetchData.len];
+        String shopsDistance[] = new String[fetchData.len];
+        for (int i=0; i< fetchData.len ; i++) {
+            shopsName[i] = fetchData.shops.get(i).name;
+            shopsRating[i] = fetchData.shops.get(i).rating.toString();
+            shopsDistance[i] = fetchData.shops.get(i).distance;
         }
-        location = getLastKnownLocation();
-        lat = location.getLatitude();
-        lng = location.getLongitude();
-        /*if(location == null){
-        }else {
-            lng = location.getLongitude();
-            lat = location.getLatitude();
-        }*/
-        //https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+lat+", "+%+lng+"&radius=500&keyword=%E9%A3%B2%E6%96%99&key=AIzaSyBMum64_lpZuX7_M0ua4Mwc8aqz3CyArLI
-        //透過gps, 更新, 間隔幾公尺
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
-        if(location == null){
-            Toast.makeText(this," !?",Toast.LENGTH_SHORT).show();
+        for (int i = 0; i < fetchData.len; i++) {
+            shopsRating[i] = fetchData.shops.get(i).rating.toString();
         }
-        cnt += 1; //第二次crash?
-        getList();
-    }
 
-    private Location getLastKnownLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return null;
+        for(int i = 0 ; i < fetchData.len ; i++){
+            HashMap<String , String> hashMap = new HashMap<>();
+            hashMap.put("shopsName" , shopsName[i]);
+            hashMap.put("shopsRating" , "評分: "+shopsRating[i]+"    距離: "+shopsDistance[i] + "公尺");
+            //將shopsName , shopsRating存入HashMap之中
+            list.add(hashMap);
+            //把HashMap存入list之中
         }
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        List<String> providers = locationManager.getAllProviders();
-        Location bestLocation = null;
-        for (String provider : providers) {
 
-            Location l = locationManager.getLastKnownLocation(provider);
-            if (l == null) {
-                continue;
-            }
-            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
-                // Found best last known location: %s", l);
-                bestLocation = l;
-            }
+        ListAdapter listAdapter = new SimpleAdapter(
+                ListActivity.this,
+                list,
+                android.R.layout.simple_list_item_2 ,
+                new String[]{"shopsName" , "shopsRating"} ,
+                new int[]{android.R.id.text1 , android.R.id.text2});
+        // 5個參數 : context , List , layout , key1 & key2 , text1 & text2
+        ListActivity.listView.setAdapter(listAdapter);
+        ListActivity.listView.setOnItemClickListener(onClickListView);
+
+    }
+    private AdapterView.OnItemClickListener onClickListView = new AdapterView.OnItemClickListener(){
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            // Toast 快顯功能 第三個參數 Toast.LENGTH_SHORT 2秒  LENGTH_LONG 5秒
+            //Toast.makeText(mContext,"點選第 "+(position +1) +" 個 \n內容：",Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(ListActivity.this,drinkActivity.class);
+            intent.putExtra("position", position);
+            ListActivity.this.startActivity(intent);
         }
-        return bestLocation;
-    }
-
-
-    private void getList(){
-        fetchData process = new fetchData(this);
-        process.execute();
-    }
-    @Override
-    public void onLocationChanged(Location location) {
-        //Log.i(Tag, "onLocationChanged"+location.toString());
-        //tv.setText(""+location.getLongitude()+","+location.getLatitude());
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-        Log.i(Tag, "onStatusChanged");
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-        Log.i(Tag, "onProviderEnbled");
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        Log.i(Tag, "onProviderDisabled");  //gps關掉
-    }
-
+    };
 
 }

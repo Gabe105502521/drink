@@ -4,37 +4,75 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/backround6"
 
     tools:context=".MainActivity">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:id="@+id/txt_heart"
+        android:layout_width="83dp"
+        android:layout_height="28dp"
+        android:layout_marginLeft="15dp"
+        android:text="清心福全"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@+id/img_heart"
+        app:layout_constraintLeft_toRightOf="@+id/txt_blue"/>
+
+    <TextView
+        android:id="@+id/txt_juice"
+        android:layout_width="83dp"
+        android:layout_height="28dp"
+        android:layout_marginLeft="30dp"
+        android:text="108果汁"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@+id/img_juice"
+        app:layout_constraintLeft_toRightOf="@+id/txt_heart"
+         />
+
+    <TextView
+        android:id="@+id/nearby"
+        android:layout_width="83dp"
+        android:layout_height="28dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="16dp"
+        android:text="最近店家"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txt_blue"
+        android:layout_width="83dp"
+        android:layout_height="23dp"
+        android:layout_marginLeft="48dp"
+        android:text="藍屋"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@+id/img_blueHouse"
+        app:layout_constraintLeft_toLeftOf="parent"/>
 
     <Button
         android:id="@+id/btn_random"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:text="喝甚麼"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:text="喝甚麼" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
     <Button
-        android:id="@+id/btn_map"
+        android:id="@+id/btn_search"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toRightOf="@+id/btn_random"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:text="地圖" />
+        android:text="搜尋" />
     <Button
         android:id="@+id/btn_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintLeft_toRightOf="@+id/btn_map"
+        app:layout_constraintLeft_toRightOf="@+id/btn_search"
         app:layout_constraintBottom_toBottomOf="parent"
         android:text="列表" />
     <Button
@@ -44,4 +82,47 @@
         app:layout_constraintLeft_toRightOf="@+id/btn_list"
         app:layout_constraintBottom_toBottomOf="parent"
         android:text="自訂飲料" />
+
+    <ImageButton
+        android:id="@+id/img_blueHouse"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="8dp"
+        android:padding="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nearby"
+        app:srcCompat="@drawable/test2"
+        tools:ignore="MissingConstraints" />
+
+    <ImageButton
+        android:id="@+id/img_heart"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="8dp"
+        android:padding="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/img_blueHouse"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nearby"
+        app:srcCompat="@drawable/heart3" />
+
+    <ImageButton
+        android:id="@+id/img_juice"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:padding="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/img_heart"
+        app:layout_constraintTop_toBottomOf="@+id/nearby"
+        app:srcCompat="@drawable/test3" />
+
 </android.support.constraint.ConstraintLayout>

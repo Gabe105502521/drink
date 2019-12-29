@@ -1,30 +1,22 @@
 package com.example.gabe;
 
 import android.content.Context;
-import android.content.Intent;
-import android.location.Location;
+import android.content.res.AssetManager;
 import android.os.AsyncTask;
-import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.Toast;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,6 +25,8 @@ import java.util.List;
 public class fetchData extends AsyncTask<Void, Void, Void> {
     private String data;
     public static List<drinkshop> shops = new ArrayList<drinkshop>();
+    public static int len =0;
+    public fetchData(){};
     private Context mContext;
     public fetchData (Context context) {
         mContext = context;
@@ -43,7 +37,7 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
     protected Void doInBackground(Void... voids) {
         try {
             //URL url =  new URL("https://api.myjson.com/bins/189646");
-           URL url =  new URL("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+ListActivity.location.getLatitude()+", "+ListActivity.location.getLongitude()+"&radius=1000&keyword="+URLEncoder.encode("飲料")+ "&key=AIzaSyBMum64_lpZuX7_M0ua4Mwc8aqz3CyArLI");
+           URL url =  new URL("https://maps.googleapis.com/maps/api/place/nearbysearch/json?location="+MainActivity.location.getLatitude()+", "+MainActivity.location.getLongitude()+"&radius=1000&keyword="+URLEncoder.encode("飲料")+ "&key=AIzaSyBMum64_lpZuX7_M0ua4Mwc8aqz3CyArLI");
 //            https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=24.968052,%20%20121.192143&radius=500&keyword=%E9%A3%B2%E6%96%99&key=AIzaSyBMum64_lpZuX7_M0ua4Mwc8aqz3CyArLI
             HttpURLConnection htTpURLConnection = (HttpURLConnection)url.openConnection();
             InputStream inputStream = htTpURLConnection.getInputStream();
@@ -64,88 +58,97 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        int len =0;
-        //location == null 會造成程式crush, 現在的寫法可能會須等一陣子才拿到
-        if(ListActivity.cnt == 1) {
-            String crappyPrefix = "null";
-            if (data.startsWith(crappyPrefix)) {
-                data = data.substring(crappyPrefix.length(), data.length());
-            } //報錯加的Value null of type org.json.JSONObject$1 cannot be converted to JSONObject
 
-            try {
-                //建立一個JSONObject並帶入JSON格式文字，getString(String key)取出欄位的數值
-                JSONObject jsonObject = new JSONObject(data);
-                JSONArray array = jsonObject.getJSONArray("results");
-                len = array.length();
-                for (int i = 0; i < len; i++) {
-                    JSONObject jsonObject2 = array.getJSONObject(i);
-
-                    //get lat, lng
-                    String geometry = jsonObject2.getString("geometry");
-                    JSONObject geo_jsonObject = new JSONObject(geometry);
-                    String location = geo_jsonObject.getString("location");
-                    JSONObject loca_jsonObject = new JSONObject(location);
-                    String lat = loca_jsonObject.getString("lat");
-                    String lng = loca_jsonObject.getString("lng");
-
-                    //get name、vicinity、rating
-                    String name = jsonObject2.getString("name");
-                    String vicinity = jsonObject2.getString("vicinity");
-                    String rating = jsonObject2.getString("rating");
-                    drinkshop shop = new drinkshop(name, Double.parseDouble(lat), Double.parseDouble(lng), vicinity, Double.parseDouble(rating));
-                    shops.add(shop);
-                }
-            } catch (JSONException e) {
-                Log.e(ListActivity.Tag, Log.getStackTraceString(e));
-            }
-            //sort
-            sortRating(shops);
-        }
-        List<HashMap<String, String>> list = new ArrayList<>();
-        String shopsName[] = new String[len];
-        String shopsRating[] = new String[len];
-        String shopsDistance[] = new String[len];
-        for (int i=0; i< len ; i++) {
-            shopsName[i] = shops.get(i).name;
-        }
-        for (int i = 0; i < len; i++) {
-            shopsRating[i] = shops.get(i).rating.toString();
-        }
         Double mlng = 0.0, mlat = 0.0;
-        if( ListActivity.location == null) {
-            Toast.makeText(mContext," 未得到位址",Toast.LENGTH_SHORT).show();
-        }else {
-            mlng = ListActivity.location.getLongitude();
-            mlat = ListActivity.location.getLatitude();
-            //Toast.makeText(mContext, " " + mlat + " " + mlng, Toast.LENGTH_SHORT).show();
-        }
-        for (int i = 0; i < len; i++) {
-            shopsDistance[i] = Double.toString(gps2m(mlat, mlng, shops.get(i).lat, shops.get(i).lng));
-        }
+        mlng = MainActivity.location.getLongitude();
+        mlat = MainActivity.location.getLatitude();
 
-        for(int i = 0 ; i < len ; i++){
-            HashMap<String , String> hashMap = new HashMap<>();
-            hashMap.put("shopsName" , shopsName[i]);
-            hashMap.put("shopsRating" , "評分: "+shopsRating[i]+"    距離: "+shopsDistance[i] + "公尺");
-            //將shopsName , shopsRating存入HashMap之中
-            list.add(hashMap);
-            //把HashMap存入list之中
+
+        //location == null 會造成程式crush,
+        String crappyPrefix = "null";
+        if (data.startsWith(crappyPrefix)) {
+            data = data.substring(crappyPrefix.length(), data.length());
+        } //報錯加的Value null of type org.json.JSONObject$1 cannot be converted to JSONObject
+        try {
+            //建立一個JSONObject並帶入JSON格式文字，getString(String key)取出欄位的數值
+            JSONObject jsonObject = new JSONObject(data);
+            JSONArray array = jsonObject.getJSONArray("results");
+            len = array.length();
+            for (int i = 0; i < len; i++) {
+                JSONObject jsonObject2 = array.getJSONObject(i);
+
+                //get lat, lng
+                String geometry = jsonObject2.getString("geometry");
+                JSONObject geo_jsonObject = new JSONObject(geometry);
+                String location = geo_jsonObject.getString("location");
+                JSONObject loca_jsonObject = new JSONObject(location);
+                String lat = loca_jsonObject.getString("lat");
+                String lng = loca_jsonObject.getString("lng");
+                //get name、vicinity、ratin
+                String name = jsonObject2.getString("name");
+                String vicinity = jsonObject2.getString("vicinity");
+                String rating = jsonObject2.getString("rating");
+                String distance = Double.toString(gps2m(mlat, mlng, Double.valueOf(lat),Double.valueOf(lng)));
+                drinkshop shop = new drinkshop(name, Double.parseDouble(lat), Double.parseDouble(lng), vicinity, Double.parseDouble(rating), distance);
+                shops.add(shop);
+            }
+        } catch (JSONException e) {
+            //Log.e(ListActivity.Tag, Log.getStackTraceString(e));
         }
-        ListAdapter listAdapter = new SimpleAdapter(
-                mContext,
-                list,
-                android.R.layout.simple_list_item_2 ,
-                new String[]{"shopsName" , "shopsRating"} ,
-                new int[]{android.R.id.text1 , android.R.id.text2});
-        // 5個參數 : context , List , layout , key1 & key2 , text1 & text2
-        ListActivity.listView.setAdapter(listAdapter);
-        ListActivity.listView.setOnItemClickListener(onClickListView);
-}
+        //sort
+        sortRating(shops);
+
+        //開始讀資料
+        AssetManager assetManager = mContext.getAssets();
+        InputStream inputStream = null;
+        HashMap<String , String> drinks = new HashMap<>();
+        String[] fileNames = null;
+        try {
+            fileNames = mContext.getAssets().list("shops"); //不能含"/"
+            //Toast.makeText(mContext, ""+fileNames.length, Toast.LENGTH_SHORT).show();
+
+            for(int i = 0; i < fileNames.length; i++){
+                inputStream = assetManager.open("shops/"+fileNames[i]);
+                String text = loadTextFile(inputStream);
+                BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(text.getBytes(Charset.forName("utf8"))), Charset.forName("utf8")));
+                String line, tmp;
+//                Toast.makeText(mContext, fileNames[i].substring(0,fileNames[i].length()-4), Toast.LENGTH_SHORT).show();
+
+                while ( (line = br.readLine()) != null ) {
+                    if(!line.trim().equals("")) {
+                        String[] ss = line.split("\\s+");
+                        drinks.put(ss[0], ss[1]);
+
+                    }
+                }
+                for(int j = 0; j < len; j++){
+                    if(fetchData.shops.get(j).name.equals(fileNames[i].substring(0,fileNames[i].length()-4))){
+
+                        //Toast.makeText(mContext, "有嗎", Toast.LENGTH_SHORT).show();
+                        fetchData.shops.get(j).drinks = drinks;
+                        break;
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     //sort by rating
     public static void sortRating(List<drinkshop> list){
         Collections.sort(list);//编译通过；
     }
-
+    //讀檔
+    private String loadTextFile(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        byte[] bytes = new byte[4096];
+        int len = 0;
+        while ((len = inputStream.read(bytes)) > 0) {
+            byteArrayOutputStream.write(bytes, 0, len);
+        }
+        return new String(byteArrayOutputStream.toByteArray(), "UTF-8");
+    }
     //經緯算距離
     private double gps2m(double lat_a, double lng_a, double lat_b, double lng_b) {
         double EARTH_RADIUS = 6378137.0;
@@ -160,16 +163,4 @@ public class fetchData extends AsyncTask<Void, Void, Void> {
         s = Math.round(s * 10000) / 10000;
         return s;
     }
-
-
-
-    private AdapterView.OnItemClickListener onClickListView = new AdapterView.OnItemClickListener(){
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            // Toast 快顯功能 第三個參數 Toast.LENGTH_SHORT 2秒  LENGTH_LONG 5秒
-            //Toast.makeText(mContext,"點選第 "+(position +1) +" 個 \n內容：",Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(mContext,drinkActivity.class);
-            mContext.startActivity(intent);
-        }
-    };
 }

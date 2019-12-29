@@ -1,12 +1,14 @@
 package com.example.gabe;
 
-import android.app.ActionBar;
-import android.content.Context;
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.AssetManager;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.provider.Settings;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,50 +16,37 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class    MainActivity extends AppCompatActivity {
 
-
+    private LocationManager locationManager;
+    public static double lat, lng;
+    public static Location location;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
-        /*
-        //先讀取txt
-        AssetManager assetManager = getAssets();
-        InputStream inputStream = null;
-        try {
-            inputStream = assetManager.open("text.txt");
-            String text = loadTextFile(inputStream);
-            //tv.setText(text);
-            BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(text.getBytes(Charset.forName("utf8"))), Charset.forName("utf8")));
-            String line, tmp;
 
-            while ( (line = br.readLine()) != null ) {
-                if(!line.trim().equals("")){
-                    String[] ss = line.split("\\s");
-                    tmp  = ss[0] + "\nL  " + ss[1];
-                }
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            openGPS();
+        }
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) { //android 版本 > android版 api版本
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
             }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }*/
+        }
+        location = getLastKnownLocation();
 
         Button btn_random = findViewById(R.id.btn_random);
-        Button btn_map = findViewById(R.id.btn_map);
+        Button btn_search = findViewById(R.id.btn_search);
         Button btn_list = findViewById(R.id.btn_list);
         Button btn_maker = findViewById(R.id.btn_maker);
+
+        //ImageButton imageButton11 = findViewById(R.id.imageButton11);
+
         btn_random.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,11 +56,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btn_map.setOnClickListener(new View.OnClickListener() {
+        btn_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.setClass(MainActivity.this, MapsActivity.class);
+                intent.setClass(MainActivity.this, search.class);
                 startActivity(intent);
             }
         });
@@ -91,22 +80,39 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        LocationManager locationManager
-                = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-            openGPS();
-        }
 
+        getList();
+        //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, (LocationListener) this);
+        //Toast.makeText(MainActivity.this, ""+location.getLongitude(), Toast.LENGTH_SHORT).show();
     }
-    private String loadTextFile(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        byte[] bytes = new byte[4096];
-        int len = 0;
-        while ((len = inputStream.read(bytes)) > 0) {
-            byteArrayOutputStream.write(bytes, 0, len);
+
+    private void getList(){
+        fetchData process = new fetchData(MainActivity.this);
+        process.execute();
+    }
+
+    private Location getLastKnownLocation() {
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return null;
         }
-        return new String(byteArrayOutputStream.toByteArray(), "UTF-8");
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        List<String> providers = locationManager.getAllProviders();
+        Location bestLocation = null;
+        for (String provider : providers) {
+
+            Location l = locationManager.getLastKnownLocation(provider);
+            if (l == null) {
+                continue;
+            }
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                // Found best last known location: %s", l);
+                bestLocation = l;
+            }
+        }
+        return bestLocation;
     }
+
+
     private void openGPS() {
         new AlertDialog.Builder(MainActivity.this)
                 .setIcon(R.mipmap.ic_launcher)
