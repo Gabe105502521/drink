@@ -12,12 +12,12 @@
 
 四. 用列表加選單完成自調飲料的功能。  
 
-![image](https://github.com/Gabe105502521/drink/blob/master/195025.jpg)
-![image](https://github.com/Gabe105502521/drink/blob/master/195024.jpg)
-![image](https://github.com/Gabe105502521/drink/blob/master/195018.jpg)
-![image](https://github.com/Gabe105502521/drink/blob/master/195019.jpg)
-![image](https://github.com/Gabe105502521/drink/blob/master/195020.jpg)
-![image](https://github.com/Gabe105502521/drink/blob/master/195021.jpg)
-![image](https://github.com/Gabe105502521/drink/blob/master/195022.jpg)
+<img width="150" height="250" src="https://github.com/Gabe105502521/drink/blob/master/195025.jpg"/>
+<img width="150" height="250" src="https://github.com/Gabe105502521/drink/blob/master/195024.jpg"/>
+<img width="150" height="250" src="https://github.com/Gabe105502521/drink/blob/master/195018.jpg"/>
+<img width="150" height="250" src="https://github.com/Gabe105502521/drink/blob/master/195019.jpg"/>
+<img width="150" height="250" src="https://github.com/Gabe105502521/drink/blob/master/195020.jpg"/>
+<img width="150" height="250" src="https://github.com/Gabe105502521/drink/blob/master/195021.jpg"/>
+<img width="150" height="250" src="https://github.com/Gabe105502521/drink/blob/master/195022.jpg"/>
 
 
