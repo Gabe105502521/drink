@@ -11,6 +11,7 @@
 三. 透過google map的search api獲得附近一公里內飲料店的相關資訊，並萃取所要資訊後用以評分及距離排列後列表表示出來  
 
 四. 用列表加選單完成自調飲料的功能。  
-<div align="center">
-  <height="250" src="https://github.com/Gabe105502521/drink/blob/master/195025.jpg"/><height="250" src="https://github.com/Gabe105502521/drink/blob/master/195024.jpg"/><height="250" src="https://github.com/Gabe105502521/drink/blob/master/195018.jpg"/><height="250" src="https://github.com/Gabe105502521/drink/blob/master/195019.jpg"/><height="250" src="https://github.com/Gabe105502521/drink/blob/master/195020.jpg"/><height="250" src="https://github.com/Gabe105502521/drink/blob/master/195021.jpg"/><height="250" src="https://github.com/Gabe105502521/drink/blob/master/195022.jpg"/>
+
+<div style="float:none;clear:both;">
+  <img src="https://github.com/Gabe105502521/drink/blob/master/195025.jpg" height="250" /><img src="https://github.com/Gabe105502521/drink/blob/master/195024.jpg" height="250" /><img src="https://github.com/Gabe105502521/drink/blob/master/195018.jpg" height="250" /><img src="https://github.com/Gabe105502521/drink/blob/master/195019.jpg" height="250" /><img src="https://github.com/Gabe105502521/drink/blob/master/195020.jpg" height="250" /><img src="https://github.com/Gabe105502521/drink/blob/master/195022.jpg" height="250" />
 </div>
